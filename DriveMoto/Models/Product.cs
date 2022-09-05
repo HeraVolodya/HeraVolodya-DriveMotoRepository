@@ -13,6 +13,8 @@ namespace DriveMoto.Models
         [Required]
         public string? Name { get; set; }
         [Required]
+        public string ImageURL { get; set; }
+        [Required]
         public int СodeProduct { get; set; }
         [Required]
         public string? Сategory { get; set; }
@@ -20,5 +22,7 @@ namespace DriveMoto.Models
         public double Price { get; set; }
         [Required]
         public double Discount { get; set; }
+
+        public List<CartItem> CartItems { get; set; }
     }
 }
