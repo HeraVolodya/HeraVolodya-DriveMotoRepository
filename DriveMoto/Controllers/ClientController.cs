@@ -72,7 +72,6 @@ namespace DriveMoto.Controllers
                     client.Password = updateClientRequest.Password;
 
                     await dbClients.SaveChangesAsync();
-
                     return Ok(_mapper.Map<ClientDTO>(client));
 
                 }
