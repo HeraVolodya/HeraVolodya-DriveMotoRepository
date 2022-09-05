@@ -17,6 +17,8 @@ namespace DriveMoto.Controllers
         private readonly APIDbContext dbClients;
         private readonly IMapper _mapper;
 
+        //ClientRepository clientRepository = new 
+
         public ClientController(APIDbContext dbClients, IMapper mapper)
         {
             this.dbClients = dbClients;
@@ -56,7 +58,7 @@ namespace DriveMoto.Controllers
         //редагування клієнта
         [HttpPut]
         [Route("{id:guid}")]
-        public async Task<IActionResult> UpdateCliaent([FromRoute] Guid id, UpdateClientRequest updateClientRequest)
+        public async Task<IActionResult> UpdateCliaent([FromRoute] Guid id, DateTimeOffset datatime, UpdateClientRequest updateClientRequest)
         {
             try
             {
@@ -97,7 +99,7 @@ namespace DriveMoto.Controllers
                     dbClients.Remove(client);
                     await dbClients.SaveChangesAsync();
 
-                    return Ok(client);
+                    return Ok(NoContent);
                 }
 
                 return NotFound();

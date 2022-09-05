@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 
 namespace DriveMoto.Models
 {
@@ -7,6 +8,8 @@ namespace DriveMoto.Models
     {
         [Required]
         public Guid Id { get; set; }
+        [Required]
+        public DateTimeOffset DataTime { get; set; } = DateTimeOffset.Now;
         [Required]
         public string? FirstName { get; set; }
         [Required] 

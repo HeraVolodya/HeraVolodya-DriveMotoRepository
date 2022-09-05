@@ -94,7 +94,7 @@ namespace DriveMoto.Controllers
                 {
                     dbProducts.Remove(product);
                     await dbProducts.SaveChangesAsync();
-                    return Ok(product);
+                    return Ok(NoContent);
                 }
 
                 return NotFound();
