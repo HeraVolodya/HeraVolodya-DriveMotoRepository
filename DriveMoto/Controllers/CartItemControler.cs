@@ -26,7 +26,6 @@ namespace DriveMoto.Controllers
         public async Task<IActionResult> GetCartItem() => Ok(await dbCartItems.CartItems.ToListAsync());
 
         [HttpPost]
-        
         public async Task<IActionResult> AddCarItem(
             [FromBody] AddCartItemRequest addCartItemRequest)
         {
@@ -54,5 +53,18 @@ namespace DriveMoto.Controllers
             }
 
         }
+
+        [HttpDelete("{id:Guid}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var deleteCartItem = dbCartItems.CartItems.SingleOrDefault(cl => cl.Id == id);
+            if (deleteCartItem == null)
+                return BadRequest();
+            dbCartItems.CartItems.Remove(deleteCartItem);
+            await dbCartItems.SaveChangesAsync();
+            return Ok();
+        }
+
+
     }
 }

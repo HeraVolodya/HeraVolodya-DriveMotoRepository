@@ -9,8 +9,8 @@ namespace DriveMoto.Models
         [Required]
         public Guid ProductId { get; set; }
 
-        public Client? Client { get; set; }
+        //public Client? Client { get; set; }
 
-        public Product? Product { get; set; }
+        //public Product? Product { get; set; }
     }
 }
