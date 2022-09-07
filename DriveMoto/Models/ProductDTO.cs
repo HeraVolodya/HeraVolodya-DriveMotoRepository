@@ -7,6 +7,8 @@ namespace DriveMoto.Models
         [Required]
         public string? Name { get; set; }
         [Required]
+        public string? ImageURL { get; set; }
+        [Required]
         public int СodeProduct { get; set; }
         [Required]
         public string? Сategory { get; set; }

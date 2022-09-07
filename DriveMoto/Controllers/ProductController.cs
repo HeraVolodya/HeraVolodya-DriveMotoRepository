@@ -37,6 +37,7 @@ namespace DriveMoto.Controllers
                 {
                     Id = Guid.NewGuid(),
                     Name = addProductRequest.Name,
+                    ImageURL = addProductRequest.ImageURL,
                     СodeProduct = addProductRequest.СodeProduct,
                     Сategory = addProductRequest.Сategory,
                     Price = addProductRequest.Price,
@@ -82,28 +83,15 @@ namespace DriveMoto.Controllers
 
         }
         //видалення продукту
-        [HttpDelete]
-        [Route("{id:guid}")]
-        public async Task<IActionResult> DeleteЗкщвгсе([FromRoute] Guid id)
+        [HttpDelete("{id:Guid}")]
+        public async Task<IActionResult> Delete(Guid id)
         {
-            try
-            {
-                var product = await dbProducts.Products.FindAsync(id);
-
-                if (product != null)
-                {
-                    dbProducts.Remove(product);
-                    await dbProducts.SaveChangesAsync();
-                    return Ok(product);
-                }
-
-                return NotFound();
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-            
+            var deleteProduct = dbProducts.Products.SingleOrDefault(p => p.Id == id);
+            if (deleteProduct == null)
+                return BadRequest();
+            dbProducts.Products.Remove(deleteProduct);
+            await dbProducts.SaveChangesAsync();
+            return Ok();
         }
 
     }

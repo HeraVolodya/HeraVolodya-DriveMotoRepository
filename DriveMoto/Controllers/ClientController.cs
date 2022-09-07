@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Net.Security;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace DriveMoto.Controllers
 {
@@ -40,6 +42,8 @@ namespace DriveMoto.Controllers
                     Email = addClientRequest.Email,
                     Phone = addClientRequest.Phone,
                     Password = addClientRequest.Password
+
+                    //return Ok(_mapper.Map<Client>(addClientRequest));
                 };
                 await dbClients.Clients.AddAsync(client);
                 await dbClients.SaveChangesAsync();
@@ -56,7 +60,7 @@ namespace DriveMoto.Controllers
         //редагування клієнта
         [HttpPut]
         [Route("{id:guid}")]
-        public async Task<IActionResult> UpdateCliaent([FromRoute] Guid id, UpdateClientRequest updateClientRequest)
+        public async Task<IActionResult> UpdateCliaent([FromRoute] Guid id, DateTimeOffset datatime, UpdateClientRequest updateClientRequest)
         {
             try
             {
@@ -70,7 +74,6 @@ namespace DriveMoto.Controllers
                     client.Password = updateClientRequest.Password;
 
                     await dbClients.SaveChangesAsync();
-
                     return Ok(_mapper.Map<ClientDTO>(client));
 
                 }
@@ -84,30 +87,18 @@ namespace DriveMoto.Controllers
 
         }
         //видалення клієнта
-        [HttpDelete]
-        [Route("{id:guid}")]
-        public async Task<IActionResult> DeleteClient([FromRoute] Guid id)
+        [HttpDelete("{id:Guid}")]
+        public async Task<IActionResult> Delete(Guid id)
         {
-            try
-            {
-                var client = await dbClients.Clients.FindAsync(id);
-
-                if (client != null)
-                {
-                    dbClients.Remove(client);
-                    await dbClients.SaveChangesAsync();
-
-                    return Ok(client);
-                }
-
-                return NotFound();
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-
+            var deleteClient = dbClients.Clients.SingleOrDefault(c => c.Id == id);
+            if (deleteClient == null)
+                return BadRequest();
+            dbClients.Clients.Remove(deleteClient);
+            await dbClients.SaveChangesAsync();
+            return Ok();
         }
+
     }
+    
 }
 
