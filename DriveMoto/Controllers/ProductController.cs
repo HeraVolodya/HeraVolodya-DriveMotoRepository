@@ -14,20 +14,20 @@ namespace DriveMoto.Controllers
                                  // а замість слова [controller] буде підставлятися назва контролера, в даному випадку Produkts
     public class ProductController : Controller
     {
-        private readonly APIDbContext dbProducts;
+        private readonly APIDbContext _dbProducts;
         private readonly IMapper _mapper;
 
         public ProductController(APIDbContext dbProducts, IMapper mapper)
         {
-            this.dbProducts = dbProducts;
+            _dbProducts = dbProducts;
             _mapper = mapper;
         }
 
-        //отримання вього списку товарив
-        //отримання всього списку клієнтів  
+        //receiving this list of products
         [HttpGet]
-        public async Task<IActionResult> GetProducts() => Ok(await dbProducts.Products.ToListAsync());
-        //додавання нового продукту
+        public async Task<IActionResult> GetProducts() => Ok(await _dbProducts.Products.ToListAsync());
+
+        //adding a new product
         [HttpPost]
         public async Task<IActionResult> AddProduct(AddProductRequest addProductRequest)
         {
@@ -37,13 +37,14 @@ namespace DriveMoto.Controllers
                 {
                     Id = Guid.NewGuid(),
                     Name = addProductRequest.Name,
+                    ImageURL = addProductRequest.ImageURL,
                     СodeProduct = addProductRequest.СodeProduct,
                     Сategory = addProductRequest.Сategory,
                     Price = addProductRequest.Price,
                     Discount = addProductRequest.Discount
                 };
-                await dbProducts.Products.AddAsync(product);
-                await dbProducts.SaveChangesAsync();
+                await _dbProducts.Products.AddAsync(product);
+                await _dbProducts.SaveChangesAsync();
 
                 return Ok(_mapper.Map<ProductDTO>(product));
             }
@@ -51,27 +52,28 @@ namespace DriveMoto.Controllers
             {
                 return BadRequest(e.Message);
             }
-           
         }
-        //редагування продукту
-        [HttpPut]
+
+        //product editing
+                [HttpPut]
         [Route("{id:guid}")]
         public async Task<IActionResult> UpdateProduct([FromRoute] Guid id, UpdateProductRequest updateProductRequest)
         {
             try
             {
-                var product = await dbProducts.Products.FindAsync(id);
+                var product = await _dbProducts.Products.FindAsync(id);
                 if (product != null)
                 {
                     product.Name = updateProductRequest.Name;
+                    product.ImageURL = updateProductRequest.ImageURL;
                     product.СodeProduct = updateProductRequest.СodeProduct;
+                    product.Сategory = updateProductRequest.Сategory;
                     product.Price = updateProductRequest.Price;
                     product.Discount = updateProductRequest.Discount;
 
-                    await dbProducts.SaveChangesAsync();
+                    await _dbProducts.SaveChangesAsync();
 
                     return Ok(_mapper.Map<ProductDTO>(product));
-
                 }
                 return NotFound();
             }
@@ -79,32 +81,20 @@ namespace DriveMoto.Controllers
             {
                 return BadRequest(e.Message);
             }
-
         }
-        //видалення продукту
-        [HttpDelete]
-        [Route("{id:guid}")]
-        public async Task<IActionResult> DeleteЗкщвгсе([FromRoute] Guid id)
+
+        //removing the product
+        [HttpDelete("{id:Guid}")]
+        public async Task<IActionResult> Delete(Guid id)
         {
-            try
-            {
-                var product = await dbProducts.Products.FindAsync(id);
-
-                if (product != null)
-                {
-                    dbProducts.Remove(product);
-                    await dbProducts.SaveChangesAsync();
-                    return Ok(NoContent);
-                }
-
-                return NotFound();
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-            
+            var deleteProduct = _dbProducts.Products.SingleOrDefault(p => p.Id == id);
+            if (deleteProduct == null)
+                return BadRequest();
+            _dbProducts.Products.Remove(deleteProduct);
+            await _dbProducts.SaveChangesAsync();
+            return Ok();
         }
 
     }
 }
+

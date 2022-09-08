@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Net.Security;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace DriveMoto.Controllers
 {
@@ -14,20 +16,18 @@ namespace DriveMoto.Controllers
                                  // а замість слова [controller] буде підставлятися назва контролера, в даному випадку Client
     public class ClientController : Controller
     {
-        private readonly APIDbContext dbClients;
+        private readonly APIDbContext _dbClients;
         private readonly IMapper _mapper;
-
-        //ClientRepository clientRepository = new 
 
         public ClientController(APIDbContext dbClients, IMapper mapper)
         {
-            this.dbClients = dbClients;
+            _dbClients = dbClients;
             _mapper = mapper;
         }
-        //отримання всього списку клієнтів
+        //getting the entire list of customers
         [HttpGet]
-        public async Task<IActionResult> GetClients() => Ok(await dbClients.Clients.ToListAsync());
-        
+        public async Task<IActionResult> GetClients() => Ok(await _dbClients.Clients.ToListAsync());
+
         //додавання нового клієнтв
         [HttpPost]
         public async Task<IActionResult> AddClient(AddClientRequest addClientRequest)
@@ -43,8 +43,8 @@ namespace DriveMoto.Controllers
                     Phone = addClientRequest.Phone,
                     Password = addClientRequest.Password
                 };
-                await dbClients.Clients.AddAsync(client);
-                await dbClients.SaveChangesAsync();
+                await _dbClients.Clients.AddAsync(client);
+                await _dbClients.SaveChangesAsync();
 
 
                 return Ok(_mapper.Map<ClientDTO>(client));
@@ -55,14 +55,14 @@ namespace DriveMoto.Controllers
             }
 
         }
-        //редагування клієнта
+        //client editing
         [HttpPut]
         [Route("{id:guid}")]
-        public async Task<IActionResult> UpdateCliaent([FromRoute] Guid id, DateTimeOffset datatime, UpdateClientRequest updateClientRequest)
+        public async Task<IActionResult> UpdateCliaent([FromRoute] Guid id, UpdateClientRequest updateClientRequest)
         {
             try
             {
-                var client = await dbClients.Clients.FindAsync(id);
+                var client = await _dbClients.Clients.FindAsync(id);
                 if (client != null)
                 {
                     client.FirstName = updateClientRequest.FirstName;
@@ -71,7 +71,7 @@ namespace DriveMoto.Controllers
                     client.Email = updateClientRequest.Email;
                     client.Password = updateClientRequest.Password;
 
-                    await dbClients.SaveChangesAsync();
+                    await _dbClients.SaveChangesAsync();
                     return Ok(_mapper.Map<ClientDTO>(client));
 
                 }
@@ -84,31 +84,19 @@ namespace DriveMoto.Controllers
             }
 
         }
-        //видалення клієнта
-        [HttpDelete]
-        [Route("{id:guid}")]
-        public async Task<IActionResult> DeleteClient([FromRoute] Guid id)
+        //delete the client
+        [HttpDelete("{id:Guid}")]
+        public async Task<IActionResult> Delete(Guid id)
         {
-            try
-            {
-                var client = await dbClients.Clients.FindAsync(id);
-
-                if (client != null)
-                {
-                    dbClients.Remove(client);
-                    await dbClients.SaveChangesAsync();
-
-                    return Ok(NoContent);
-                }
-
-                return NotFound();
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-
+            var deleteClient = _dbClients.Clients.SingleOrDefault(c => c.Id == id);
+            if (deleteClient == null)
+                return BadRequest();
+            _dbClients.Clients.Remove(deleteClient);
+            await _dbClients.SaveChangesAsync();
+            return Ok();
         }
+
     }
+    
 }
 
