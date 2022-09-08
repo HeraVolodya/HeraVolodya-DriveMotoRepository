@@ -14,17 +14,19 @@ namespace DriveMoto.Controllers
 
     public class CartItemControler : Controller
     {
-        private readonly APIDbContext dbCartItems;
+        private readonly APIDbContext _dbCartItems;
         private readonly IMapper _mapper;
 
         public CartItemControler(APIDbContext dbCartItems, IMapper mapper)
         {
-            this.dbCartItems = dbCartItems;
+            _dbCartItems = dbCartItems;
             _mapper = mapper;
         }
+        //getting a shopping list
         [HttpGet]
-        public async Task<IActionResult> GetCartItem() => Ok(await dbCartItems.CartItems.ToListAsync());
+        public async Task<IActionResult> GetCartItem() => Ok(await _dbCartItems.CartItems.ToListAsync());
 
+        //creating a purchase
         [HttpPost]
         public async Task<IActionResult> AddCarItem(
             [FromBody] AddCartItemRequest addCartItemRequest)
@@ -38,10 +40,10 @@ namespace DriveMoto.Controllers
                     ProductId = addCartItemRequest.ProductId
 
                 };
-                await dbCartItems.CartItems.AddAsync(cartItem);
-                await dbCartItems.SaveChangesAsync();
+                await _dbCartItems.CartItems.AddAsync(cartItem);
+                await _dbCartItems.SaveChangesAsync();
 
-                var newCartItem = await dbCartItems.CartItems
+                var newCartItem = await _dbCartItems.CartItems
                     .Include(t => t.Product)
                     .FirstOrDefaultAsync(t => t.Id == cartItem.Id);
 
@@ -54,14 +56,15 @@ namespace DriveMoto.Controllers
 
         }
 
+        //delete purchase
         [HttpDelete("{id:Guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var deleteCartItem = dbCartItems.CartItems.SingleOrDefault(cl => cl.Id == id);
+            var deleteCartItem = _dbCartItems.CartItems.SingleOrDefault(cl => cl.Id == id);
             if (deleteCartItem == null)
                 return BadRequest();
-            dbCartItems.CartItems.Remove(deleteCartItem);
-            await dbCartItems.SaveChangesAsync();
+            _dbCartItems.CartItems.Remove(deleteCartItem);
+            await _dbCartItems.SaveChangesAsync();
             return Ok();
         }
 
