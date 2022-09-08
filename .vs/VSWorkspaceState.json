@@ -6,6 +6,6 @@
     "\\DriveMoto\\DataBase",
     "\\DriveMoto\\Models"
   ],
-  "SelectedNode": "\\DriveMoto\\Program.cs",
+  "SelectedNode": "\\DriveMoto\\DataBase\\APIDbContext.cs",
   "PreviewInSolutionExplorer": false
 }
